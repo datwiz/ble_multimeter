@@ -62,9 +62,6 @@ time based analysis over assuming a specific sampling rate.
 Summary of the datagram processing for re-assembly into device readings.
 
 ```mermaid
----
-title: Digital MM BLE Message Re-Assembly
----
 stateDiagram
   state "Header Sync" as sync
   state h_char <<choice>>
