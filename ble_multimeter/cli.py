@@ -1,4 +1,3 @@
-import bleak
 from typer import Typer
 from rich.console import Console
 

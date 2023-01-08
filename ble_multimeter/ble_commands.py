@@ -1,4 +1,3 @@
-from time import sleep
 from rich.console import Console
 import typer
 from typer import Typer
@@ -99,7 +98,7 @@ def mm_reader_monitor(sender: int, data: bytearray) -> None:
                 "units": mm_msg.mm_units(),
             }
             console.print(mm_reading)
-        except ValueError as e:
+        except ValueError:
             if global_opts["verbose"]:
                 err_console.print(f"Invalid value: {mm_msg.payload.hex('-')}")
             # skip invalid value messages
@@ -236,9 +235,9 @@ def mm_listen():
                     err_console.print("resetting retry window")
                     retry_attempt = 0
                 retry_attempt += 1
-                err_console.print(f"--- retrying to connect ---")
-            except asyncio.TimeoutError as e:
-                err_console.print(f"--- retry timed out ---")
+                err_console.print("--- retrying to connect ---")
+            except asyncio.TimeoutError:
+                err_console.print("--- retry timed out ---")
                 break
     except KeyboardInterrupt:
         err_console.print("--- monitoring aborted ---")
@@ -287,9 +286,9 @@ def mm_monitor():
                     err_console.print("resetting retry window")
                     retry_attempt = 0
                 retry_attempt += 1
-                err_console.print(f"--- retrying to connect ---")
-            except asyncio.TimeoutError as e:
-                err_console.print(f"--- retry timed out ---")
+                err_console.print("--- retrying to connect ---")
+            except asyncio.TimeoutError:
+                err_console.print("--- retry timed out ---")
                 break
     except KeyboardInterrupt:
         err_console.print("--- monitoring aborted ---")
