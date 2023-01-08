@@ -1,6 +1,7 @@
 import pendulum
 from ble_multimeter.bit_flag_decoder import bit_flag_is_set
 
+
 class MmBleMessage:
     """
     message parser and decoder for the ble messages.
@@ -11,43 +12,43 @@ class MmBleMessage:
     """
 
     mode_settings = {
-        0x01: 'VAC',
-        0x02: 'VDC',
-        0x04: 'Resistance',
-        0x05: 'Capacitance',
-        0x06: 'Temperature',
-        0x07: 'Amps-DC',
-        0x08: 'mAmps-DC',
-        0x09: 'uAmps-DC',
-        0x0c: 'Amps-AC',
-        0x0d: 'mAmps-AC',
-        0x0e: 'uAmps-AC',
-        0x0f: 'Diode test',
-        0x10: 'Frequency',
-        0x20: 'Continuity',
+        0x01: "VAC",
+        0x02: "VDC",
+        0x04: "Resistance",
+        0x05: "Capacitance",
+        0x06: "Temperature",
+        0x07: "Amps-DC",
+        0x08: "mAmps-DC",
+        0x09: "uAmps-DC",
+        0x0C: "Amps-AC",
+        0x0D: "mAmps-AC",
+        0x0E: "uAmps-AC",
+        0x0F: "Diode test",
+        0x10: "Frequency",
+        0x20: "Continuity",
     }
 
     mode_units = {
-        0x01: 'V',
-        0x02: 'A',
-        0x03: 'Ohms',
-        0x04: 'Hz',
-        0x05: 'F',
-        0x06: 'Ohms continuity',
-        0x07: 'V diode test',
-        0x08: 'Deg C',
-        0x09: 'Deg F',
-        0x10: '%',
+        0x01: "V",
+        0x02: "A",
+        0x03: "Ohms",
+        0x04: "Hz",
+        0x05: "F",
+        0x06: "Ohms continuity",
+        0x07: "V diode test",
+        0x08: "Deg C",
+        0x09: "Deg F",
+        0x10: "%",
     }
 
     units_multiplier = {
-        0x00: [1.0, ''],
-        0x01: [1_000.0, 'k'],
-        0x02: [1_000_000.0, 'M'],
-        0x03: [10.0**-9, 'n'],
-        0x04: [10.0**-6, 'u'],
-        0x05: [10.0**-3, 'm'], # Amps
-        0x06: [10.0**-3, 'm'], # Volts
+        0x00: [1.0, ""],
+        0x01: [1_000.0, "k"],
+        0x02: [1_000_000.0, "M"],
+        0x03: [10.0**-9, "n"],
+        0x04: [10.0**-6, "u"],
+        0x05: [10.0**-3, "m"],  # Amps
+        0x06: [10.0**-3, "m"],  # Volts
     }
 
     def __init__(self, message_length: int, fixed_header: bytearray) -> None:
@@ -92,7 +93,7 @@ class MmBleMessage:
                 self.buffer.append(next_byte)
             else:
                 self.reset_parser()
-       # else in the message assembly state 
+        # else in the message assembly state
         else:
             if (len(self.buffer) + 1) < self.message_length:
                 self.buffer.append(next_byte)
@@ -105,11 +106,10 @@ class MmBleMessage:
                 self.reset_parser()
 
     def mm_mode(self) -> str:
-        return self.mode_settings.get(self.payload[4], 'Unknown')
+        return self.mode_settings.get(self.payload[4], "Unknown")
 
     def mm_value_raw(self) -> str:
-        """
-        """
+        """ """
         pass
 
     def mm_decimal_places(self) -> int:
@@ -120,13 +120,13 @@ class MmBleMessage:
         Parsed value from the meter reading
         """
 
-        if self.payload[5] == 0x0b or self.payload[5] == 0x0f:
+        if self.payload[5] == 0x0B or self.payload[5] == 0x0F:
             raise ValueError("undefined overload value")
 
         val = 0.0
         # print(f"payload: {self.payload.hex('-')}")
         # print(f"payload[5:9]: {self.payload[5:9].hex('-')}")
-        if self.payload[8] == 0x0f:
+        if self.payload[8] == 0x0F:
             return 0.0
 
         for i, v in enumerate(self.payload[5:9]):
@@ -135,7 +135,7 @@ class MmBleMessage:
         if bit_flag_is_set(self.payload[12], 0):
             val = -val
         # raise ValueError("temp output")
-        return (val / (10.0 ** self.mm_decimal_places()) )
+        return val / (10.0 ** self.mm_decimal_places())
 
     def mm_units(self) -> str:
         """
@@ -146,6 +146,3 @@ class MmBleMessage:
         if units is None or multiplier is None:
             raise ValueError("Unknown units or multiplier")
         return f"{multiplier[1]}{units}"
-
-
-
