@@ -6,7 +6,7 @@ This has been a journey of discovery into Bluetooth LE connectivity and use of a
 The code uses the excellent [Bleak](https://bleak.readthedocs.io/en/latest/) cross-platform bluetooth 
 library, but only executed on MacOS.  You're mileage may vary.
 
-The product includes a Windows only app and iPhone App, but this connects on MacOS abd provides more control over
+The device includes a Windows only app and iPhone App, but this connects on MacOS abd provides more control over
 data collection and analysis.
 The driving objective is to progress the software to a package that can be used for realtime visualisation, probably
 with the help of a timeseries database.
