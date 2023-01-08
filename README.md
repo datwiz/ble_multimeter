@@ -14,6 +14,7 @@ with the help of a timeseries database.
 ## Shout outs
 Thanks to Mike McCauley for sharing analysis of the QM1578 comms protocol - a major time saver.
 https://www.airspayce.org/mikem/QM1578/protocol.txt 
+https://github.com/sigrokproject/libsigrok/pull/187
 
 ## Installation
 Install for local use by cloning the repo and installing dependencies using poetry.
