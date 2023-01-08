@@ -1,0 +1,114 @@
+---
+2023-01-04:  Sourced from https://www.airspayce.com/mikem/QM1578/protocol.txt
+---
+
+This is a description of the Bluetooth interface and data stream protocol of the
+Digitech QM1578 Digital Multimeter
+2022-06-25 mikem@airspayce.com
+
+BLUETOOTH:
+
+I used the excellent nRF Connect app from Nordic on IOS to find the relevant
+Bluetooth LE details of this DMM to make a connection. The details found were:
+
+Advertised Device: Name: QM1578_DMM, Address: f4:5e:ab:72:32:02, serviceUUID: 0000fff0-0000-1000-8000-00805f9b34fb, txPower: 0
+
+Service: unknown FFF0
+Attribute: Unknown characteristic FFF2
+
+(There are other Bluetooth characteristics with unknown uses,
+but FFF2 can notify with a stream of data records,
+one for each measurement. Its the one we want)
+
+Each data record is 15 bytes long, the last byte being 0x0D
+The first 4 bytes of each packet on mine are always the same 0xD5 0xF0 0x00 0x0A
+Dont know if this is a packet header or a device type or serial number.
+
+The remaining bytes encode the current meter settings and last reading.
+Packets are emitted one for each reading. The packet rate depends on the
+measurement. Voltaves and currents aout 3 per second.
+Continuity is much faster, capacitance and temperature is slower.
+
+I have written a sketch QM1578BluetoothClient.ino (incluided in theis directory)
+for ESP32 on Arduino, that looks for such QM1578 Bluetooth devices,
+connects to the first one it finds and relays the stream of measurement data back
+to the host serial port in raw binary.
+It is therefore a Bluetooth-Serial converter for this meter.
+
+PROTOCOL:
+
+Each record is 15 bytes long.
+The last byte is always 0x0d
+The first 4 bytes (on my meter at least) are: 0xd5 0xf0 0x00 0x0a
+
+Byte offset 	  Meaning
+0    		  Always 0xd5. Ignore
+1		  Always 0xf0. Ignore
+2		  Always 0x00. Ignore
+3		  Always 0x0a. Ignore
+
+4		  Meter range switch setting:
+		  0x01: ACV
+		  0x02:	DCV
+		  0x04:	Ohms
+		  0x05: Capacitance
+		  0x06: Temperature
+		  0x07: DCA
+		  0x08: DCmA
+		  0x09: DCuA
+		  0x0c: ACA 
+		  0x0d: ACmA
+		  0x0e: ACuA
+		  0x0f: Diode test
+		  0x10: Hz/%
+		  0x20: Continuity
+
+5		  Value of digit 4, least significant digit, 0x00 to 0x09. 0x0f means invalid. 0x0b means OverLoad
+6		  Value of digit 3, 0x00 to 0x09. 0x0f means invalid
+7		  Value of digit 2, 0x00 to 0x09. 0x0f means invalid
+8		  Value of digit 1, most significant digit 0x00 to 0x09. 0x0f means invalid
+		  Note: for Overload, digits 4 to 1 are: 0x0b 0x0a 0x00 0x0b
+
+9		  Number of decimal places in value digits 0x00 to 0x04
+
+10		  Units:
+		  0x01: V
+		  0x02: A
+		  0x03: Ohms
+		  0x04: Hz
+		  0x05: F
+		  0x06: Ohms continuity test
+		  0x07: V diode test
+		  0x08: DegC
+		  0x09: DegF
+		  0x10: %
+
+11		  Multiplier:
+		  0x00: no multiplier
+		  0x01: k
+		  0x02: M
+		  0x03: n
+		  0x04: u
+		  0x05: m   (for Amps)
+		  0x06: m   (for Volts)
+		  
+12		  Flags1:
+		  1xxx xxxx	Negative
+		  x1xx xxxx	Hold
+		  xx1x xxxx	Low Z
+		  
+13		  Flags2:
+		  1xxx xxxx	AC
+		  x1xx xxxx	DC
+		  xx1x xxxx	Relative
+		  xxx1 xxxx	Auto scale
+		  xxxx 11xx	Average
+		  xxxx 10xx 	Minimum
+		  xxxx 01xx	Maximum
+		  xxxx xxx1	Peak
+		  
+14		  Always 0x0d. Record ends
+
+Corrections or updates to this information are welcomed by the author
+
+

@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "ble-multimeter"
+version = "0.1.0"
+description = "Multimeter Bluetooth connectivity"
+authors = ["Chris Ottinger <datwiz@coco.id.au>"]
+license = "MIT"
+packages = [{include = "ble_multimeter"}]
+
+[tool.poetry.scripts]
+mm = 'ble_multimeter.cli:app'
+
+[tool.poetry.dependencies]
+python = "^3.10"
+bleak = "^0.15.1"
+typer = "^0.6.1"
+rich = "^12.5.1"
+asyncio = "^3.4.3"
+pendulum = "^2.1.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+flake8 = "^5.0.4"
+black = "^22.6.0"
+pytest-cov = "^3.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

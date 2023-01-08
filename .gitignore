@@ -1,0 +1,12 @@
+.vscode/*
+
+.*.swp
+
+.env
+*.env
+
+__pycache__
+*.pyc
+
+tmp/*
+temp/*
